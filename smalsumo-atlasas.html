@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="lt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101722">
+  <title>Emilijos Smalsumo Atlasas</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: #101722;
+      color: #f3f5f0;
+      --muted: #b4bfc5;
+      --mint: #c8f47c;
+      --line: #39464e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(ellipse at 81% 0%, #203638 0%, transparent 43%);
+    }
+    .shell { width: min(70rem, calc(100% - 3rem)); margin-inline: auto; }
+    header { padding-block: 1.9rem; border-bottom: 1px solid var(--line); }
+    .brand { display: inline-flex; align-items: center; gap: .65rem; font-weight: 650; }
+    .brand span { color: var(--mint); font-size: 1.5rem; line-height: 1; }
+    main { padding-block: clamp(2.25rem, 6vw, 5rem) 2.5rem; }
+    h1, h2, p { margin: 0; }
+    h1, h2 { font-family: Georgia, serif; font-weight: 400; }
+    h1 { font-size: clamp(2.6rem, 7vw, 5.7rem); letter-spacing: -.063em; line-height: 1; }
+    .intro { color: var(--muted); margin-top: 1rem; font-size: 1.075rem; line-height: 1.55; }
+    fieldset { border: 0; padding: 0; margin: 2.15rem 0 1.3rem; min-width: 0; }
+    legend { padding: 0; margin-bottom: .7rem; color: var(--muted); font-size: .9rem; }
+    .topics { display: flex; flex-wrap: wrap; gap: .5rem; }
+    .topic { position: relative; display: inline-flex; cursor: pointer; }
+    .topic input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+    .topic span {
+      display: inline-flex;
+      align-items: center;
+      min-height: 2.75rem;
+      padding: .44rem .95rem;
+      border: 1px solid var(--line);
+      border-radius: 99rem;
+      font-size: .9rem;
+    }
+    .topic:hover span { border-color: var(--mint); }
+    .topic input:checked + span { background: #26392b; border-color: #6f8e5d; color: #e1ffa8; }
+    .topic input:focus-visible + span, button:focus-visible { outline: 2px solid var(--mint); outline-offset: 4px; }
+    .card {
+      --accent: #c8f47c;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 29%;
+      align-items: stretch;
+      border-radius: 1.5rem;
+      border: 1px solid var(--line);
+      background: #192430;
+      overflow: hidden;
+      min-height: 19.5rem;
+    }
+    .card[data-topic="istorija"] { --accent: #ffd39b; }
+    .card[data-topic="mokslas"] { --accent: #9ce9d6; }
+    .card[data-topic="gamta"] { --accent: #c8f47c; }
+    .card[data-topic="kosmosas"] { --accent: #d3c4ff; }
+    .card[data-topic="kultura"] { --accent: #ffb8c7; }
+    .fact { padding: clamp(1.5rem, 4.5vw, 3.5rem); align-self: center; }
+    .category { color: var(--accent); font-size: .9rem; font-weight: 650; letter-spacing: .08em; text-transform: uppercase; }
+    h2 { margin-top: .85rem; font-size: clamp(1.85rem, 4.2vw, 3.4rem); line-height: 1.12; letter-spacing: -.035em; }
+    .description { margin-top: 1rem; max-width: 53ch; font-size: 1.075rem; color: var(--muted); line-height: 1.6; }
+    .illustration {
+      display: grid;
+      place-items: center;
+      position: relative;
+      isolation: isolate;
+      color: var(--accent);
+      overflow: hidden;
+      background: radial-gradient(ellipse at 50% 50%, #293e46, transparent 75%);
+    }
+    .orbit, .orbit::before, .orbit::after {
+      border: 1px solid currentColor;
+      border-radius: 50%;
+    }
+    .orbit { width: 64%; max-width: 12.5rem; aspect-ratio: 1; position: relative; opacity: .6; }
+    .orbit::before, .orbit::after { content: ""; position: absolute; inset: 0; }
+    .orbit::before { transform: rotate(-37deg) scaleX(1.36) scaleY(.49); }
+    .orbit::after { transform: rotate(40deg) scaleX(1.15) scaleY(.56); }
+    .illustration span { position: absolute; font-weight: 300; font-size: clamp(2.4rem, 6vw, 4.75rem); line-height: 1; }
+    .actions { display: flex; flex-wrap: wrap; align-items: center; gap: .85rem 1.2rem; margin-top: 1.25rem; }
+    .next {
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .65rem;
+      min-height: 3.25rem;
+      font: inherit;
+      font-weight: 750;
+      color: #152117;
+      background: var(--mint);
+      border: 0;
+      border-radius: .8rem;
+      padding: .7rem 1.15rem;
+    }
+    .next:hover { background: #dfff9e; }
+    .next[aria-disabled="true"] { opacity: .65; cursor: progress; }
+    .status, .attribution { color: var(--muted); font-size: .9rem; line-height: 1.5; }
+    .attribution { margin-top: 1rem; }
+    .attribution a { color: var(--accent); text-underline-offset: .18em; }
+    .attribution a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    @media (max-width: 42rem) {
+      .shell { width: calc(100% - 2rem); }
+      header { padding-block: 1.15rem; }
+      .card { grid-template-columns: minmax(0, 1fr); min-height: 0; }
+      .illustration { grid-row: 1; min-height: 6rem; }
+      .orbit { width: 4.25rem; }
+      .illustration span { font-size: 2rem; }
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .fact.changed { animation: appear .26s ease-out; }
+      @keyframes appear { from { opacity: 0; transform: translateY(5px); } }
+    }
+  </style>
+</head>
+<body>
+  <header><div class="shell"><div class="brand"><span aria-hidden="true">✧</span> Emilijos Smalsumo Atlasas</div></div></header>
+  <main class="shell">
+    <h1>Atsitiktiniai faktai</h1>
+    <p class="intro">Pasirink temą arba atrask faktą iš visų temų.</p>
+
+    <fieldset>
+      <legend>Faktų temos</legend>
+      <div id="topics" class="topics"></div>
+    </fieldset>
+
+    <article class="card" id="card">
+      <div class="fact" id="fact" aria-live="polite" aria-atomic="true">
+        <p class="category" id="category"></p>
+        <h2 id="title">Ieškome pirmojo fakto…</h2>
+        <p class="description" id="description"></p>
+        <p class="attribution" id="attribution" hidden>
+          <a id="source" target="_blank" rel="noopener noreferrer">Vikipedijos ištrauka</a>
+          · <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.lt" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a>
+        </p>
+      </div>
+      <div class="illustration" aria-hidden="true"><div class="orbit"></div><span id="symbol"></span></div>
+    </article>
+
+    <div class="actions">
+      <button type="button" class="next" id="next"><span aria-hidden="true">↻</span> Kitas faktas</button>
+      <p class="status" id="status" role="status"></p>
+    </div>
+    <noscript><p>Kad galėtum peržiūrėti faktus, naršyklėje įjunk „JavaScript“.</p></noscript>
+  </main>
+  <script>
+    const topics = [
+      {
+        id: 'pasaulis', label: 'Pasaulis', symbol: '◎',
+        facts: [
+          ['Didžiausia pasaulio dykuma yra Antarktida', 'Dykumą apibrėžia mažas kritulių kiekis. Didelė Antarktidos dalis jų gauna labai mažai, nors žemyną dengia ledas.'],
+          ['Ramusis vandenynas užima daugiau ploto nei visa Žemės sausuma', 'Jis driekiasi tarp Azijos bei Australijos vakaruose ir Amerikos žemynų rytuose.'],
+          ['Pusiaujas kerta Pietų Ameriką', 'Pusiaujas kerta Ekvadorą, Kolumbiją ir Braziliją. Ekvadoro pavadinimas ispaniškai reiškia „pusiaujas“.'],
+          ['Vatikaną supa Romos miestas', 'Vatikanas yra nepriklausoma valstybė, kurią iš visų pusių supa Italijos sostinė Roma.'],
+          ['Sachara kadaise buvo gerokai drėgnesnė', 'Ankstyvajame holocene dalyje dabartinės Sacharos buvo ežerų ir žolynų. Apie drėgnesnį laikotarpį liudija ežerų nuosėdos ir uolų piešiniai.'],
+          ['Grenlandija yra didžiausia pasaulio sala', 'Didžiąją Grenlandijos dalį dengia ledo skydas. Australija į šį palyginimą neįtraukiama, nes ji laikoma žemynu.']
+        ]
+      },
+      {
+        id: 'istorija', label: 'Istorija', symbol: '⌛',
+        facts: [
+          ['Pompėją palaidojo Vezuvijaus išsiveržimas', '79 m. ugnikalnio išsiveržimo medžiagos užklojo miestą. Kasinėjimai atskleidė gatves, namus ir sienų tapybą.'],
+          ['„Apollo 11“ astronautai Mėnulyje nusileido 1969 metais', 'Neilas Armstrongas ir Buzzas Aldrinas išlipo ant Mėnulio paviršiaus. Michaelas Collinsas liko Mėnulio orbitoje.'],
+          ['Rozetės akmuo padėjo perskaityti Egipto hieroglifus', 'Ant akmens tas pats dekretas užrašytas hieroglifais, demotiniu raštu ir senovės graikų kalba. Užrašų palyginimas padėjo iššifruoti hieroglifus.'],
+          ['Vilnius rašytiniuose šaltiniuose minimas nuo 1323 metų', 'Lietuvos didysis kunigaikštis Gediminas tais metais laiškuose minėjo Vilnių ir kvietė atvykti amatininkus bei pirklius.'],
+          ['Baltijos kelias sujungė tris sostines', '1989 m. rugpjūčio 23 d. žmonės susikibo rankomis gyvoje grandinėje nuo Vilniaus per Rygą iki Talino.'],
+          ['Berlyno siena buvo atverta 1989 metais', 'Lapkričio 9 d. žmonės ėmė plūsti prie sienos perėjų. Tą vakarą vartai buvo atverti.']
+        ]
+      },
+      {
+        id: 'mokslas', label: 'Mokslas', symbol: '✧',
+        facts: [
+          ['Ledo tankis mažesnis už skysto vandens tankį', 'Vandeniui šąlant, jo molekulės sudaro atviresnę kristalinę gardelę. Todėl ledas plūduriuoja.'],
+          ['Garsui sklisti reikia medžiagos', 'Garsas sklinda per orą, vandenį ar kietą kūną, kai virpesiai perduodami iš dalelės dalelei. Vakuume garsas nesklinda.'],
+          ['Deimantas ir grafitas sudaryti iš anglies', 'Skirtingas anglies atomų išsidėstymas suteikia šioms medžiagoms skirtingų savybių. Grafito sluoksniai lengvai slysta vienas kito atžvilgiu.'],
+          ['Vaivorykštės forma yra apskritimas', 'Paprastai nuo žemės matome dalį apskritimo. Esant tinkamoms sąlygoms, iš lėktuvo galima pamatyti visą apskritimą.'],
+          ['Aukštai kalnuose vanduo užverda žemesnėje temperatūroje', 'Kylant aukštyn atmosferos slėgis mažėja, todėl vandeniui užvirti reikia mažesnės temperatūros.'],
+          ['Šviesa vakuume per sekundę įveikia beveik 300 tūkst. kilometrų', 'Tikslus šviesos greitis vakuume yra 299 792 458 metrai per sekundę.']
+        ]
+      },
+      {
+        id: 'gamta', label: 'Gamta', symbol: '✿',
+        facts: [
+          ['Aštuonkojai turi tris širdis', 'Dvi varo kraują į žiaunas, o trečioji pumpuoja kraują po likusį kūną.'],
+          ['Mėlynasis banginis yra žinduolis', 'Jis kvėpuoja oru, todėl iškyla į vandens paviršių, o jauniklius maitina pienu.'],
+          ['Šikšnosparniai gali aktyviai skristi', 'Jų sparnų plėvę laiko pailgėję pirštai. Šikšnosparniai yra vieninteliai žinduoliai, gebantys savarankiškai išsilaikyti ore plasnodami.'],
+          ['Dumbliai prisideda prie deguonies gamybos', 'Daugelis mikroskopinių dumblių vandenynuose fotosintezės metu naudoja Saulės šviesą ir išskiria deguonį.'],
+          ['Bitės judesiais nurodo maisto šaltinio vietą', 'Medaus bitės avilyje šokiu perduoda informaciją apie kryptį ir apytikslį atstumą iki maisto.'],
+          ['Bambukai priklauso miglinių šeimai', 'Šiai augalų šeimai priklauso ir kviečiai, ryžiai bei daugelis pievų žolių. Kai kurių bambukų stiebai sumedėja.']
+        ]
+      },
+      {
+        id: 'kosmosas', label: 'Kosmosas', symbol: '☾',
+        facts: [
+          ['Venera aplink savo ašį apsisuka lėčiau nei aplink Saulę', 'Vienas Veneros apsisukimas apie ašį trunka apie 243 Žemės paras, o kelionė aplink Saulę – apie 225 paras.'],
+          ['Marse stūkso Olimpo kalnas', 'Šis didžiulis skydinis ugnikalnis yra aukščiausias žinomas Saulės sistemos ugnikalnis.'],
+          ['Saulės šviesa Žemę pasiekia per kiek daugiau nei aštuonias minutes', 'Šviesai atstumą nuo Saulės iki Žemės įveikti vidutiniškai reikia apie 8 minučių ir 20 sekundžių.'],
+          ['Mėnulis Žemei atsukęs beveik tą pačią pusę', 'Mėnulis aplink savo ašį apsisuka per tiek pat laiko, per kiek apskrieja Žemę.'],
+          ['Saulė yra žvaigždė', 'Jos branduolyje iš vandenilio susidaro helis. Šios branduolių sintezės metu išsiskiria energija.'],
+          ['Saulės sistemoje žiedus turi keturios planetos', 'Žiedus turi Jupiteris, Saturnas, Uranas ir Neptūnas. Ryškiausius žiedus turi Saturnas.']
+        ]
+      },
+      {
+        id: 'kultura', label: 'Kultūra', symbol: '◇',
+        facts: [
+          ['Lietuvių ir latvių kalbos priklauso baltų kalbų grupei', 'Jos yra dvi iki šių dienų išlikusios gyvos baltų kalbos.'],
+          ['Leonardo da Vinci nutapė „Moną Lizą“', 'Leonardo da Vinci nutapytas portretas saugomas Luvro muziejuje Paryžiuje.'],
+          ['Haiku Japonijoje tradiciškai remiasi ritmu 5–7–5', 'Japonų kalboje skaičiuojami trumpi garsinės trukmės vienetai, vadinami moromis.'],
+          ['Pirmoji lietuviška knyga išleista Karaliaučiuje', 'Martyno Mažvydo „Katekizmas“ išspausdintas 1547 metais. Jame yra ir lietuviška abėcėlė.'],
+          ['„Don Kichotas“ pirmą kartą išleistas dviem dalimis', 'Pirmoji Miguelio de Cervanteso romano dalis pasirodė 1605 m., o antroji – 1615 m.'],
+          ['Brailio rašto ženklai sudaromi iš iškilių taškų', 'Klasikiniame Brailio rašte taškai išdėstomi dviejuose stulpeliuose po tris. Skirtingos taškų kombinacijos žymi raides ir kitus ženklus.']
+        ]
+      }
+    ];
+
+    const wikiCategories = {
+      pasaulis: ['Sostinės', 'Žemynai', 'Salos', 'Vandenynai', 'Upės', 'Kalnai', 'Lietuvos miestai'],
+      istorija: ['Lietuvos istorija', 'Istorinės valstybės', 'Archeologija', 'Senovės Roma', 'Viduramžiai', 'Antika', 'Lietuvos Didžioji Kunigaikštystė'],
+      mokslas: ['Fizika', 'Chemija', 'Matematika', 'Cheminiai elementai', 'Geologija'],
+      gamta: ['Žinduoliai', 'Paukščiai', 'Žuvys', 'Augalai', 'Grybai', 'Vabzdžiai', 'Botanika', 'Zoologija'],
+      kosmosas: ['Saulės sistema', 'Planetos', 'Žvaigždės', 'Astronomija', 'Galaktikos', 'Kosmonautika', 'Žvaigždynai', 'Kosminiai aparatai'],
+      kultura: ['Muzika', 'Literatūra', 'Dailė', 'Architektūra', 'Teatras', 'Kinas', 'Muzikos žanrai', 'Knygos']
+    };
+    const wikiOrigin = 'https://lt.wikipedia.org';
+    const get = (id) => document.getElementById(id);
+    const allLocalFacts = topics.flatMap((topic) =>
+      topic.facts.map(([title, description]) => ({ topic, title, description }))
+    );
+    const wikiStates = new Map();
+    const recentPages = new Set();
+    const localDecks = new Map();
+    let selectedTopic = null;
+    let activeRequest;
+    let currentFact;
+
+    function shuffle(items) {
+      for (let index = items.length - 1; index > 0; index--) {
+        const randomIndex = Math.floor(Math.random() * (index + 1));
+        [items[index], items[randomIndex]] = [items[randomIndex], items[index]];
+      }
+      return items;
+    }
+
+    function newCursor(title, depth) {
+      const direction = Math.random() < .5 ? 'asc' : 'desc';
+      return { title, depth, direction, continuation: {} };
+    }
+
+    function createWikiState(topic) {
+      const titles = wikiCategories[topic.id].map((name) => 'Kategorija:' + name);
+      return {
+        pending: shuffle(titles.map((title) => newCursor(title, 0))),
+        known: new Set(titles),
+        facts: []
+      };
+    }
+
+    async function getWikiBatch(cursor, signal) {
+      const endpoint = new URL('/w/api.php', wikiOrigin);
+      endpoint.search = new URLSearchParams({
+        action: 'query',
+        format: 'json',
+        formatversion: '2',
+        origin: '*',
+        generator: 'categorymembers',
+        gcmtitle: cursor.title,
+        gcmnamespace: '0|14',
+        gcmtype: 'page|subcat',
+        gcmdir: cursor.direction,
+        gcmlimit: '12',
+        prop: 'extracts|pageprops',
+        ppprop: 'disambiguation',
+        exintro: '1',
+        explaintext: '1',
+        exchars: '350',
+        exlimit: 'max',
+        ...cursor.continuation
+      });
+      const response = await fetch(endpoint, { credentials: 'omit', signal });
+      if (!response.ok) throw new Error('Wikipedia HTTP ' + response.status);
+      const data = await response.json();
+      if (data.error) throw new Error(data.error.code);
+      return data;
+    }
+
+    function addWikiPages(state, cursor, pages, topic) {
+      const candidates = [];
+      const subcategories = [];
+      for (const page of pages) {
+        if (page.ns === 14 && cursor.depth < 2 && !state.known.has(page.title) &&
+            !/^(?:Kategorija:)?(?:Nepilni\b|Vikipedija\b)|sąrašai$/iu.test(page.title)) {
+          state.known.add(page.title);
+          subcategories.push(newCursor(page.title, cursor.depth + 1));
+        }
+        if (page.ns !== 0 || page.pageprops?.disambiguation !== undefined ||
+            !Number.isInteger(page.pageid) || typeof page.extract !== 'string' ||
+            /^(?:\d{1,4}(?:\s*m\.?)?)$|(?:^|\s)sąrašas(?:\s|$)/iu.test(page.title)) continue;
+
+        const description = page.extract.replace(/\s+/gu, ' ').trim();
+        if (description.length < 70 || /\\displaystyle|Puslapyje išvardyti/iu.test(description)) continue;
+        candidates.push({
+          topic,
+          title: page.title,
+          description,
+          pageId: page.pageid
+        });
+      }
+      state.facts.push(...shuffle(candidates));
+      state.pending.push(...shuffle(subcategories));
+    }
+
+    async function getWikiFact(topic, signal) {
+      let state = wikiStates.get(topic.id);
+      for (let batch = 0; batch <= 5; batch++) {
+        while (state?.facts.length) {
+          const candidate = state.facts.pop();
+          if (recentPages.has(candidate.pageId) || currentFact?.pageId === candidate.pageId) continue;
+          return candidate;
+        }
+        if (batch === 5) break;
+
+        if (!state?.pending.length) {
+          state = createWikiState(topic);
+          wikiStates.set(topic.id, state);
+        }
+        const cursor = state.pending[0];
+        const data = await getWikiBatch(cursor, signal);
+        if (signal.aborted) return null;
+
+        state.pending.shift();
+        if (data.continue?.gcmcontinue) {
+          state.pending.push({ ...cursor, continuation: data.continue });
+        }
+        addWikiPages(state, cursor, data.query?.pages ?? [], topic);
+      }
+      return null;
+    }
+
+    function getLocalFact(topic) {
+      const key = topic?.id ?? 'visos';
+      let deck = localDecks.get(key);
+      if (!deck?.length) {
+        deck = shuffle(allLocalFacts.filter((fact) => !topic || fact.topic === topic));
+        localDecks.set(key, deck);
+      }
+      if (deck.at(-1) === currentFact && deck.length > 1) {
+        [deck[0], deck[deck.length - 1]] = [deck[deck.length - 1], deck[0]];
+      }
+      return deck.pop();
+    }
+
+    function renderFact(fact) {
+      currentFact = fact;
+      get('card').dataset.topic = fact.topic.id;
+      get('category').textContent = fact.topic.label;
+      get('title').textContent = fact.title;
+      get('description').textContent = fact.description;
+      get('symbol').textContent = fact.topic.symbol;
+      const attribution = get('attribution');
+      attribution.hidden = !fact.pageId;
+      if (fact.pageId) {
+        const source = new URL('/w/index.php', wikiOrigin);
+        source.searchParams.set('curid', fact.pageId);
+        get('source').href = source.href;
+        recentPages.add(fact.pageId);
+        if (recentPages.size > 500) recentPages.delete(recentPages.values().next().value);
+      } else {
+        get('source').removeAttribute('href');
+      }
+
+      const content = get('fact');
+      content.classList.remove('changed');
+      void content.offsetWidth;
+      content.classList.add('changed');
+    }
+
+    async function showNext() {
+      activeRequest?.abort();
+      const request = new AbortController();
+      activeRequest = request;
+      const topic = selectedTopic;
+      const wikiTopic = topic ?? topics[Math.floor(Math.random() * topics.length)];
+      const button = get('next');
+      const status = get('status');
+      let timeout;
+      let fact;
+      button.setAttribute('aria-disabled', 'true');
+
+      try {
+        if (navigator.onLine !== false) {
+          // Delay the loading message so selecting a cached fact stays quiet.
+          status.textContent = '';
+          timeout = setTimeout(() => request.abort(), 7500);
+          const loadingMessage = setTimeout(() => {
+            if (activeRequest !== request) return;
+            status.textContent = 'Ieškome fakto Vikipedijoje…';
+          }, 160);
+          try {
+            fact = await getWikiFact(wikiTopic, request.signal);
+          } finally {
+            clearTimeout(loadingMessage);
+          }
+        }
+      } catch (error) {
+        // A failed request still leaves the built-in facts available.
+      } finally {
+        clearTimeout(timeout);
+        if (activeRequest === request) {
+          renderFact(fact ?? getLocalFact(topic));
+          status.textContent = fact ? '' : 'Vikipedijos fakto gauti nepavyko. Rodomas išsaugotas faktas.';
+          button.removeAttribute('aria-disabled');
+          activeRequest = null;
+        }
+      }
+    }
+
+    for (const topic of [null, ...topics]) {
+      const label = document.createElement('label');
+      label.className = 'topic';
+      const input = document.createElement('input');
+      input.type = 'radio';
+      input.name = 'tema';
+      input.value = topic?.id ?? 'visos';
+      input.checked = !topic;
+      const text = document.createElement('span');
+      text.textContent = topic?.label ?? 'Visos temos';
+      label.append(input, text);
+      get('topics').append(label);
+
+      input.addEventListener('change', () => {
+        selectedTopic = topic;
+        void showNext();
+      });
+    }
+
+    get('next').addEventListener('click', () => {
+      if (!activeRequest) void showNext();
+    });
+    void showNext();
+  </script>
+</body>
+</html>
